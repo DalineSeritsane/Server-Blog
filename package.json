@@ -9,9 +9,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.21.1",
     "extra-path": "^1.2.0",
     "fs": "^0.0.1-security",
-    "nodemon": "^3.1.7"
+    "fs-extra": "^11.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.7",
+    "path": "^0.12.7"
   }
 }
