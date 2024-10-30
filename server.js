@@ -4,6 +4,7 @@ const path = require("path");
 const authorRoutes = require("./controllers/routes/authorRoutes");
 const app = express();
 app.use(express.json);
+const authorController = require("./controllers/authorController");
 
 
 
