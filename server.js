@@ -3,10 +3,18 @@ const fs = require("fs-extra");
 const path = require("path");
 const authorRoutes = require("./controllers/routes/authorRoutes");
 const app = express();
-app.use(express.json);
 const authorController = require("./controllers/authorController");
+app.use(express.json());
 
-
+blogPosts = [
+    {
+      "id": 1,
+      "title": "The Future of Artificial Intelligence",
+      "content": "Artificial intelligence is rapidly advancing and transforming industries across the world. From healthcare to finance, AI is improving efficiency and providing new insights.",
+      "author": "John Doe",
+      "date": "2024-10-21"
+    },
+]
 
 app.get("/", (req, res)=> {
     console.log("running get")
@@ -21,6 +29,7 @@ app.get("/api/posts", (req, res) => {
 
 // Route to fetch a single blog post by its ID
 app.get("/api/posts/:id", (req, res) => {
+    console.log(req.params)
     const postId = parseInt(req.params.id);
     const post = blogPosts.find((p) => p.id === postId);
 
@@ -47,14 +56,15 @@ app.get("/api/posts/:id/comments", (req, res) => {
 
 // POST route to add a new blog post
 app.post("/api/posts", (req, res) => {
+    console.log(req.body)
     const newPost = {
-        id: blogPosts.length + 1, 
+         id: blogPosts.length + 1, 
         title: req.body.title,
         content: req.body.content,
-        comments: [] 
+         comments: [] 
     };
     
-    blogPosts.push(newPost); 
+     blogPosts.push(newPost); 
     console.log("New blog post created:", newPost);
     res.status(201).json(newPost); 
 });
