@@ -1,13 +1,12 @@
 const fs = require("fs-extra");
 const path = require("path");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
-const userBlog = path.join(__dirname, "../data/users"); // Use __dirname for relative path
+const databasePath = path.join(__dirname, "../database.json"); // Define path to database.json
 
 exports.signup = async (req, res) => {
     try {
-        const { id, password, title, content, comments } = req.body;
+        const { id, password } = req.body;
 
         if (!id || !password) {
             return res.status(400).json({ message: "ID and password are required" });
@@ -16,37 +15,33 @@ exports.signup = async (req, res) => {
         // Hash the password for secure storage
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new user object
+        // Create a new user object with essential data only
         const newUser = {
             id,
-            blogs: [
-                {
-                    title: "First Blog Post",
-                    content: "This is the content of the first blog post",
-                    comments: [
-                        { id: 1, author: "Swarts", text: "Amazing view!" },
-                        { id: 2, author: "Lou", text: "Couples deserve such sight" }
-                    ]
-                },
-                {
-                    title: "Second Blog Post",
-                    content: "Other places experienced posts",
-                    comments: [
-                        { id: 1, author: "Lisle", text: "Very interesting, I can not wait for our trip!" }
-                    ]
-                }
-            ],
+            blogs: [], // Initialize an empty blogs array
             hashedPassword
         };
 
-        // Define the path to the user's JSON file
-        const userFile = path.join(userBlog, `${newUser.id}.json`);  // Ensure each file is saved as JSON
+        // Load existing users from database.json (or create an empty array if the file doesn't exist)
+        let users = [];
+        if (await fs.pathExists(databasePath)) {
+            users = await fs.readJson(databasePath);
+        }
 
-        // Write the new user data to a JSON file
-        await fs.writeJson(userFile, newUser);
+        // Check if the user ID already exists
+        const existingUser = users.find(user => user.id === id);
+        if (existingUser) {
+            return res.status(400).json({ message: "User ID already exists" });
+        }
+
+        // Add the new user to the users array
+        users.push(newUser);
+
+        // Write the updated users array to database.json
+        await fs.writeJson(databasePath, users);
 
         // Respond with success message
-        res.status(201).json({ message: "User registered successfully", user: newUser });
+        res.status(201).json({ message: "User registered successfully", user: { id: newUser.id } });
     } catch (error) {
         res.status(500).json({ message: "Error signing up user", error: error.message });
     }
